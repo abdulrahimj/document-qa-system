@@ -1,0 +1,17 @@
+# Java / Spring Boot
+backend/target/
+backend/.mvn/
+backend/*.iml
+*.class
+HELP.md
+
+# Node / React
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# IDE / OS
+.idea/
+.claude/
+.DS_Store
+*.log

@@ -1,0 +1,78 @@
+:root {
+  --text: #1a1a1a;
+  --text-muted: #555;
+  --bg: #fff;
+  --border: #000;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #f2f2f2;
+    --text-muted: #aaa;
+    --bg: #000;
+    --border: #fff;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  width: 800px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100svh;
+}
+
+h1,
+h2 {
+  font-weight: 600;
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  color: var(--bg);
+  background: var(--text);
+}
+
+button:disabled {
+  color: var(--text-muted);
+  border-color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+input[type='file'] {
+  font: inherit;
+  color: var(--text);
+}
