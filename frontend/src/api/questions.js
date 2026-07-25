@@ -1,4 +1,4 @@
-const BASE_URL = '/api/questions'
+const BASE_URL = `${import.meta.env.VITE_API_URL}/api/questions`
 
 export async function askQuestion(question) {
   const res = await fetch(BASE_URL, {
