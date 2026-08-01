@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { uploadDocument } from './api/documents'
 import { askQuestion } from './api/questions'
 import './App.css'
@@ -14,11 +14,29 @@ function App() {
   const [selectedFile, setSelectedFile] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState(null)
+  const [dragging, setDragging] = useState(false)
+  const fileInputRef = useRef(null)
 
   const [question, setQuestion] = useState('')
   const [asking, setAsking] = useState(false)
   const [questionError, setQuestionError] = useState(null)
   const [result, setResult] = useState(null)
+
+  function pickFile(file) {
+    setSelectedFile(file ?? null)
+    setUploadError(null)
+  }
+
+  function clearFile() {
+    pickFile(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  function handleDrop(event) {
+    event.preventDefault()
+    setDragging(false)
+    pickFile(event.dataTransfer.files[0])
+  }
 
   async function handleUpload(event) {
     event.preventDefault()
@@ -29,8 +47,7 @@ function App() {
     try {
       const uploaded = await uploadDocument(selectedFile)
       setDocuments([uploaded])
-      setSelectedFile(null)
-      event.target.reset()
+      clearFile()
     } catch (e) {
       setUploadError(e.message)
     } finally {
@@ -56,71 +73,152 @@ function App() {
     }
   }
 
+  // Enter submits, Shift+Enter adds a newline - expected behaviour for a chat-like box
+  function handleQuestionKeyDown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      event.currentTarget.form.requestSubmit()
+    }
+  }
+
   return (
     <div id="app">
       <header>
+        <p className="eyebrow">RAG · Retrieval augmented answers</p>
         <h1>Document Q&amp;A</h1>
-        <p>Upload documents, then ask questions about them.</p>
+        <p className="tagline">Upload a document, then ask questions about it.</p>
       </header>
 
-      <section id="upload">
-        <form onSubmit={handleUpload}>
-          <input
-            type="file"
-            onChange={(e) => setSelectedFile(e.target.files[0] ?? null)}
-          />
-          <button type="submit" disabled={!selectedFile || uploading}>
-            {uploading ? 'Uploading…' : 'Upload'}
-          </button>
-        </form>
-        {uploadError && <p className="error">{uploadError}</p>}
-      </section>
+      <main>
+        <section id="upload" aria-labelledby="upload-heading">
+          <h2 id="upload-heading">1 · Upload a document</h2>
 
-      <section id="documents">
-        <h2>Documents</h2>
-        {documents.length === 0 ? (
-          <p className="empty">No documents uploaded yet.</p>
-        ) : (
-          <ul>
-            {documents.map((doc) => (
-              <li key={doc.id}>
-                <span className="filename">{doc.filename}</span>
-                <span className="status">{doc.status}</span>
-                <span className="meta">{formatBytes(doc.fileSizeBytes)}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+          <form onSubmit={handleUpload}>
+            <label
+              className={`dropzone${dragging ? ' is-dragging' : ''}`}
+              onDragOver={(e) => {
+                e.preventDefault()
+                setDragging(true)
+              }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={handleDrop}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="visually-hidden"
+                onChange={(e) => pickFile(e.target.files[0])}
+              />
+              <span className="dropzone-title">
+                {dragging ? 'Drop the file here' : 'Choose a file or drag it here'}
+              </span>
+              <span className="dropzone-hint">PDF, TXT and other text documents</span>
+            </label>
 
-      <section id="ask">
-        <h2>Ask a question</h2>
-        <form onSubmit={handleAsk}>
-          <input
-            type="text"
-            placeholder="What would you like to know?"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-          />
-          <button type="submit" disabled={!question.trim() || asking}>
-            {asking ? 'Thinking…' : 'Ask'}
-          </button>
-        </form>
-        {questionError && <p className="error">{questionError}</p>}
+            {selectedFile && (
+              <div className="file-chip">
+                <span className="file-chip-name" title={selectedFile.name}>
+                  {selectedFile.name}
+                </span>
+                <span className="file-chip-size">{formatBytes(selectedFile.size)}</span>
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={clearFile}
+                  disabled={uploading}
+                  aria-label={`Remove ${selectedFile.name}`}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
 
-        {result && (
-          <div className="answer">
-            <p className="answer-text">{result.answer}</p>
-            {result.sources.length > 0 && (
-              <ul className="sources">
-                {result.sources.map((source) => (
-                  <li key={source.documentId}>{source.filename}</li>
-                ))}
-              </ul>
+            <div className="actions">
+              <button type="submit" disabled={!selectedFile || uploading}>
+                {uploading ? 'Uploading…' : 'Upload'}
+              </button>
+              {uploading && <span className="dots" aria-hidden="true" />}
+            </div>
+          </form>
+
+          {uploadError && (
+            <p className="error" role="alert">
+              {uploadError}
+            </p>
+          )}
+        </section>
+
+        <section id="documents" aria-labelledby="documents-heading">
+          <h2 id="documents-heading">2 · Documents</h2>
+          {documents.length === 0 ? (
+            <p className="empty">No documents uploaded yet.</p>
+          ) : (
+            <ul>
+              {documents.map((doc) => (
+                <li key={doc.id}>
+                  <span className="filename" title={doc.filename}>
+                    {doc.filename}
+                  </span>
+                  <span className="meta">{formatBytes(doc.fileSizeBytes)}</span>
+                  <span className="status">{doc.status}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section id="ask" aria-labelledby="ask-heading">
+          <h2 id="ask-heading">3 · Ask a question</h2>
+
+          <form onSubmit={handleAsk}>
+            <textarea
+              rows={3}
+              placeholder="What would you like to know?"
+              aria-label="Your question"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={handleQuestionKeyDown}
+            />
+            <div className="actions">
+              <button type="submit" disabled={!question.trim() || asking}>
+                {asking ? 'Thinking…' : 'Ask'}
+              </button>
+              <span className="hint">Enter to send · Shift + Enter for a new line</span>
+            </div>
+          </form>
+
+          {questionError && (
+            <p className="error" role="alert">
+              {questionError}
+            </p>
+          )}
+
+          <div aria-live="polite">
+            {asking && (
+              <p className="thinking">
+                Searching your documents
+                <span className="dots" aria-hidden="true" />
+              </p>
+            )}
+
+            {!asking && result && (
+              <article className="answer">
+                <p className="answer-text">{result.answer}</p>
+                {result.sources.length > 0 && (
+                  <>
+                    <p className="sources-label">Sources</p>
+                    <ul className="sources">
+                      {result.sources.map((source) => (
+                        <li key={source.documentId}>{source.filename}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </article>
             )}
           </div>
-        )}
-      </section>
+        </section>
+      </main>
 
       <footer>
         <p>Abdulrahim Jalloh &amp; Fatmata Sesay</p>

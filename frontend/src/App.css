@@ -1,119 +1,274 @@
 #app {
-  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding: 56px 24px 24px;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- header ---------- */
+
 header {
-  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
 }
 
 header h1 {
   margin: 0 0 8px;
-  font-size: 32px;
+  font-size: 40px;
+  line-height: 110%;
+  letter-spacing: -0.02em;
 }
 
-header p {
+.tagline {
   margin: 0;
   color: var(--text-muted);
 }
 
-#upload form {
+/* ---------- sections ---------- */
+
+main {
+  flex: 1;
+}
+
+section {
+  margin-top: 40px;
+}
+
+section h2 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-family: var(--mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.actions {
   display: flex;
-  gap: 12px;
   align-items: center;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.hint,
+.empty {
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
 .error {
-  margin-top: 12px;
-  color: var(--text);
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  background: var(--surface);
+  font-size: 15px;
   font-weight: 600;
 }
 
-#documents {
-  margin-top: 32px;
+button.ghost {
+  padding: 4px 10px;
+  font-size: 13px;
+  border-color: var(--border-soft);
 }
 
-#documents h2 {
-  font-size: 20px;
-  margin: 0 0 16px;
+/* ---------- upload ---------- */
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 40px 24px;
+  text-align: center;
+  border: 2px dashed var(--border-soft);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
 }
 
-.empty {
+.dropzone:hover,
+.dropzone:focus-within,
+.dropzone.is-dragging {
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.dropzone.is-dragging {
+  border-style: solid;
+}
+
+.dropzone-title {
+  font-weight: 600;
+}
+
+.dropzone-hint {
   color: var(--text-muted);
+  font-size: 14px;
 }
+
+.file-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.file-chip-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.file-chip-size {
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+/* ---------- documents ---------- */
 
 #documents ul {
   list-style: none;
   margin: 0;
   padding: 0;
+  border-top: 1px solid var(--border-soft);
 }
 
 #documents li {
   display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-soft);
 }
 
 #documents .filename {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 600;
-}
-
-#documents .status {
-  font-family: var(--mono);
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border: 1px solid var(--border);
-  padding: 2px 8px;
 }
 
 #documents .meta {
   color: var(--text-muted);
   font-family: var(--mono);
+  font-size: 14px;
+}
+
+#documents .status {
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+}
+
+/* ---------- ask ---------- */
+
+#ask textarea {
+  display: block;
+  width: 100%;
+  resize: vertical;
+  line-height: 150%;
+}
+
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 24px;
+  color: var(--text-muted);
   font-size: 15px;
 }
 
-#ask {
-  margin-top: 40px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border);
+/* three blinking squares - monochrome stand-in for a spinner */
+.dots {
+  flex: none;
+  width: 4px;
+  height: 4px;
+  margin-right: 22px;
+  background: var(--text-muted);
+  box-shadow:
+    11px 0 var(--text-muted),
+    22px 0 var(--text-muted);
+  animation: blink 900ms ease-in-out infinite;
 }
 
-#ask h2 {
-  font-size: 20px;
-  margin: 0 0 16px;
-}
-
-#ask form {
-  display: flex;
-  gap: 12px;
-}
-
-#ask input[type='text'] {
-  flex: 1;
-  font: inherit;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  padding: 8px 12px;
+@keyframes blink {
+  0% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.25;
+  }
 }
 
 .answer {
   margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .answer-text {
+  margin: 0;
   white-space: pre-wrap;
-  line-height: 160%;
+  line-height: 165%;
+}
+
+.sources-label {
+  margin: 20px 0 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .sources {
   list-style: none;
-  margin: 16px 0 0;
-  padding: 16px 0 0;
-  border-top: 1px solid var(--border);
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -123,13 +278,16 @@ header p {
   font-family: var(--mono);
   font-size: 13px;
   border: 1px solid var(--border);
-  padding: 2px 8px;
+  background: var(--bg);
+  padding: 3px 8px;
 }
 
+/* ---------- footer ---------- */
+
 footer {
-  margin-top: 48px;
+  margin-top: 56px;
   padding-top: 16px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-soft);
   text-align: center;
 }
 
@@ -137,4 +295,31 @@ footer p {
   margin: 0;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  #app {
+    padding: 32px 16px 16px;
+  }
+
+  header h1 {
+    font-size: 30px;
+  }
+
+  .dropzone {
+    padding: 28px 16px;
+  }
+
+  #documents li {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  #documents .filename {
+    flex-basis: 100%;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
 }

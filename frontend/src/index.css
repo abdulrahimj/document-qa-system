@@ -2,10 +2,16 @@
   --text: #1a1a1a;
   --text-muted: #555;
   --bg: #fff;
+  /* subtle grey fill used for cards/chips - stays strictly monochrome */
+  --surface: #f4f4f4;
   --border: #000;
+  --border-soft: #cfcfcf;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
+
+  --space: 8px;
+  --radius: 2px;
 
   font: 18px/145% var(--sans);
   color-scheme: light dark;
@@ -26,7 +32,9 @@
     --text: #f2f2f2;
     --text-muted: #aaa;
     --bg: #000;
+    --surface: #141414;
     --border: #fff;
+    --border-soft: #3a3a3a;
   }
 }
 
@@ -39,7 +47,7 @@ body {
 }
 
 #root {
-  width: 800px;
+  width: 840px;
   max-width: 100%;
   margin: 0 auto;
   min-height: 100svh;
@@ -49,16 +57,32 @@ h1,
 h2 {
   font-weight: 600;
   color: var(--text);
+  text-wrap: balance;
+}
+
+::selection {
+  color: var(--bg);
+  background: var(--text);
+}
+
+/* single visible focus style for every interactive element */
+:where(a, button, input, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
 }
 
 button {
   font: inherit;
+  font-weight: 500;
   color: var(--text);
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 0;
-  padding: 8px 16px;
+  border-radius: var(--radius);
+  padding: 10px 20px;
   cursor: pointer;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
 }
 
 button:hover:not(:disabled) {
@@ -66,13 +90,37 @@ button:hover:not(:disabled) {
   background: var(--text);
 }
 
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
 button:disabled {
   color: var(--text-muted);
-  border-color: var(--text-muted);
+  border-color: var(--border-soft);
   cursor: not-allowed;
 }
 
-input[type='file'] {
+input,
+textarea {
   font: inherit;
   color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
